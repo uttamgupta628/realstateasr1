@@ -1,3 +1,4 @@
+require('dotenv').config();   
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -5,7 +6,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 
 // Load environment variables
-dotenv.config();
+// dotenv.config();
 
 // Initialize express app
 const app = express();
@@ -14,29 +15,10 @@ const app = express();
 connectDB();
 
 // Middleware
-// Allowed origins
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://furniture-psi-gilt.vercel.app',
-  'http://localhost:5173' // local dev frontend
-];
-
-// CORS middleware
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin like Postman or curl
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `CORS policy does not allow access from this origin: ${origin}`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+  origin: process.env.FRONTEND_URL || 'https://furniture-psi-gilt.vercel.app',
   credentials: true
 }));
-
-// Handle preflight requests
-app.options('*', cors());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
