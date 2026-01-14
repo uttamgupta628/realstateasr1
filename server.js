@@ -14,10 +14,29 @@ const app = express();
 connectDB();
 
 // Middleware
+// Allowed origins
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'https://furniture-psi-gilt.vercel.app',
+  'http://localhost:5173' // local dev frontend
+];
+
+// CORS middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://furniture-psi-gilt.vercel.app/login',
+  origin: function(origin, callback) {
+    // Allow requests with no origin like Postman or curl
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `CORS policy does not allow access from this origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
